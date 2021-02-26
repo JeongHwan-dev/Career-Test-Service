@@ -27,26 +27,17 @@ function Test() {
     console.log(`성별 코드: ${userGender}`);
   }
 
-  // 검사자 정보 입력을 체크하는 함수
-  function formCheck() {
-    if (currentPage === 1) {
-      // 이름과 성별 입력이 모두 완료되어 있지 않다면
-      if (userName.length === 0 || userGender === false) {
-        return true; // 검색 시작 버튼 비활성화
-      }
-      // 이름과 성별 입력이 모두 완료되어 있다면
-      else {
-        return false; // 검색 시작 버튼 활성화
-      }
-    } else if (currentPage === 2) {
-      if (document.querySelector(`input[name="ex-answer"]`).value === false) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
+  // 성별 선택 라디오 버튼 활성화 시키는 함수 (이름 입력 시 호출)
+  function genderRadioON() {
+    console.log('genderRadioON 함수 호출');
+    document.querySelector('#male-radio').removeAttribute('disabled');
+    document.querySelector('#female-radio').removeAttribute('disabled');
+  }
+
+  // 버튼 활성화 시키는 함수 (성별 라디오 버튼 클릭 시 호출)
+  function buttonON() {
+    console.log('buttonON 함수 호출');
+    document.querySelector('#start-btn').removeAttribute('disabled');
   }
 
   // 현재 페이지로 다음 페이지로 넘기는 함수
@@ -110,12 +101,7 @@ function Test() {
   // 검사 시작 버튼 컴포넌트
   function StartButton() {
     return (
-      <button
-        type="button"
-        className="btn-outline-primary"
-        disabled={formCheck()}
-        onClick={nextPage}
-      >
+      <button type="button" className="btn-outline-primary" onClick={nextPage}>
         검사 시작
       </button>
     );
@@ -155,7 +141,12 @@ function Test() {
         <div className="form-group">
           <label>
             이름
-            <input name="name" type="text" className="form-control" onChange={inputName} />
+            <input
+              name="name"
+              type="text"
+              className="form-control"
+              onChange={(inputName, genderRadioON)}
+            />
           </label>
         </div>
         <div className="form-group">
@@ -167,8 +158,10 @@ function Test() {
                   name="gender"
                   type="radio"
                   className="form-check-input"
+                  id="male-radio"
                   value="100323"
-                  onChange={inputGender}
+                  disabled
+                  onChange={(inputGender, buttonON)}
                 />
                 남성
               </label>
@@ -179,8 +172,10 @@ function Test() {
                   name="gender"
                   type="radio"
                   className="form-check-input"
+                  id="female-radio"
                   value="100324"
-                  onChange={inputGender}
+                  disabled
+                  onChange={(inputGender, buttonON)}
                 />
                 여성
               </label>
@@ -188,12 +183,7 @@ function Test() {
           </div>
         </div>
         <div>
-          <button
-            type="button"
-            className="btn-outline-primary"
-            disabled={formCheck()}
-            onClick={nextPage}
-          >
+          <button type="button" className="btn-outline-primary" id="start-btn" onClick={nextPage}>
             검사 시작
           </button>
         </div>
