@@ -6,39 +6,43 @@ import './css/Test.css';
 function Test() {
   const [userName, setUserName] = useState(''); // 검사자 이름
   const [userGender, setUserGender] = useState(false); // 검사자 성별
+  const [exAnswer, setExAnswer] = useState(false); // 예시 문항 선택 기록
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
   const [data, setData] = useState([{}]); // 질문 데이터 (JSON 배열)
   const [answers, setAnswers] = useState(''); // 검사자 선택 기록 데이터
-  const [questionPage, setQuestionPage] = useState(0); // 퀴즈 페이지 번호
+  const [questionPage, setQuestionPage] = useState(0); // 퀴즈 페이지
 
-  // 사용자 데이터 저장 함수
+  // 검사자 데이터 함수
+  function userData() {
+    const userResultData = {
+      apikey: '',
+      qestrnSeq: '6',
+      trgetSe: '100206',
+      name: userName,
+      gender: userGender,
+      grade: '2',
+      email: '',
+      startDtm: Date.now(),
+      answers: '',
+    };
+  }
 
-  // 검사자 이름을 받아오는 함수
-  function inputName() {
-    const newUserName = document.querySelector(`input[name="name"]`).value;
-    setUserName(newUserName);
+  // 검사자 이름을 받아오는 핸들러
+  const onNameHandler = (event) => {
+    setUserName(event.currentTarget.value);
     console.log(`검사자 이름: ${userName}`);
-  }
+  };
 
-  // 검사자 성별을 받아오는 함수
-  function inputGender() {
-    const newUserGender = document.querySelector(`input[name="gender"]`).value;
-    setUserGender(newUserGender);
+  // 검사자 성별을 받아오는 핸들러
+  const onGenderHandler = (event) => {
+    setUserGender(event.currentTarget.value);
     console.log(`성별 코드: ${userGender}`);
-  }
+  };
 
-  // 성별 선택 라디오 버튼 활성화 시키는 함수 (이름 입력 시 호출)
-  function genderRadioON() {
-    console.log('genderRadioON 함수 호출');
-    document.querySelector('#male-radio').removeAttribute('disabled');
-    document.querySelector('#female-radio').removeAttribute('disabled');
-  }
-
-  // 버튼 활성화 시키는 함수 (성별 라디오 버튼 클릭 시 호출)
-  function buttonON() {
-    console.log('buttonON 함수 호출');
-    document.querySelector('#start-btn').removeAttribute('disabled');
-  }
+  const onExampleHandler = (event) => {
+    setExAnswer(event.currentTarget.value);
+    console.log(`예시 문제 선택지: ${exAnswer}`);
+  };
 
   // 현재 페이지로 다음 페이지로 넘기는 함수
   function nextPage() {
@@ -86,6 +90,7 @@ function Test() {
 
   useEffect(() => {
     getOpenAPI();
+    console.log(group);
   }, []);
 
   // 질문 데이터 묶음 저장 그룹
@@ -96,12 +101,79 @@ function Test() {
     group[i] = data.slice(i * 4, i * 4 + 4);
   }
 
+  // 한 개의 테스트 질문 페이지에 문제 할당하는 함수
+  function allocateQuestion(group) {
+    const page = group.map((jsonData, index) => {
+      return (
+        <>
+          <div className="question-form">
+            <div>{jsonData.qitemNo}. 두 개 가치 중에 자신에게 더 중요한 가치를 선택하세요.</div>
+            <div className="answers-form">
+              <div className="check-form">
+                <label>
+                  <input
+                    type="radio"
+                    name={`B${jsonData.qitemNo}`}
+                    className="form-check-input"
+                    value={jsonData.answerScore01}
+                  />
+                  {jsonData.answer01}
+                </label>
+              </div>
+              <div className="check-form">
+                <label>
+                  <input
+                    type="radio"
+                    name={`B${jsonData.qitemNo}`}
+                    className="form-check-input"
+                    value={jsonData.answerScore02}
+                  />
+                  {jsonData.answer02}
+                </label>
+              </div>
+            </div>
+          </div>
+          <br></br>
+        </>
+      );
+    });
+    return page;
+  }
+
+  // 테스트 질문 컴포넌트
+  function QuestionContainer() {
+    // OpenAPI 질문 데이터 4개씩 묶기
+    for (var i = 0; i < data.length / 4; i++) {
+      group[i] = data.slice(i * 4, i * 4 + 4);
+    }
+    if (group.length <= 0) {
+      return <></>;
+    }
+    return (
+      <>
+        {group.map((item, index) => {
+          return (
+            <>
+              <div
+                className="question-page"
+                id={`group${index}`}
+                style={{ display: questionPage === index ? 'block' : 'none' }}
+              >
+                {allocateQuestion(group[index])}
+              </div>
+            </>
+          );
+        })}
+      </>
+    );
+  }
+
   // 컴포넌트
 
   // 검사 시작 버튼 컴포넌트
   function StartButton() {
     return (
-      <button type="button" className="btn-outline-primary" onClick={nextPage}>
+      <button type="button" className="btn-outline-primary" disabled={!exAnswer} onClick={nextPage}>
         검사 시작
       </button>
     );
@@ -128,7 +200,7 @@ function Test() {
   // 제출 버튼 컴포넌트
   function SubmitButton() {
     return (
-      <button type="button" className="btn-outline-primary" onClick={moveResult}>
+      <button type="button" className="btn-outline-primary" onClick={(moveResult, userData)}>
         제출
       </button>
     );
@@ -145,7 +217,8 @@ function Test() {
               name="name"
               type="text"
               className="form-control"
-              onChange={(inputName, genderRadioON)}
+              value={userName}
+              onChange={onNameHandler}
             />
           </label>
         </div>
@@ -160,8 +233,7 @@ function Test() {
                   className="form-check-input"
                   id="male-radio"
                   value="100323"
-                  disabled
-                  onChange={(inputGender, buttonON)}
+                  onChange={onGenderHandler}
                 />
                 남성
               </label>
@@ -174,8 +246,7 @@ function Test() {
                   className="form-check-input"
                   id="female-radio"
                   value="100324"
-                  disabled
-                  onChange={(inputGender, buttonON)}
+                  onChange={onGenderHandler}
                 />
                 여성
               </label>
@@ -183,7 +254,13 @@ function Test() {
           </div>
         </div>
         <div>
-          <button type="button" className="btn-outline-primary" id="start-btn" onClick={nextPage}>
+          <button
+            type="button"
+            className="btn-outline-primary"
+            id="user-start-btn"
+            disabled={!(userGender && userName)}
+            onClick={nextPage}
+          >
             검사 시작
           </button>
         </div>
@@ -208,13 +285,25 @@ function Test() {
           <div className="answers-form">
             <div className="check-form">
               <label>
-                <input type="radio" name="ex-answer" className="form-check-input" value="-1" />
+                <input
+                  type="radio"
+                  name="ex-answer"
+                  className="form-check-input"
+                  value="-1"
+                  onChange={onExampleHandler}
+                />
                 창의성
               </label>
             </div>
             <div className="check-form">
               <label>
-                <input type="radio" name="ex-answer" className="form-check-input" value="-2" />
+                <input
+                  type="radio"
+                  name="ex-answer"
+                  className="form-check-input"
+                  value="-2"
+                  onChange={onExampleHandler}
+                />
                 안정성
               </label>
             </div>
@@ -240,41 +329,56 @@ function Test() {
           </div>
         </div>
         <div className="body-container">
-          {group[questionPage].map((jsondata, idx) => {
-            // 이런식으로 map함수를 사용해 html코드 안에서 반복문을 돌릴 수 있습니다.
-            return (
-              <>
-                <div className="question-form">
-                  <div>두 개 가치 중에 자신에게 더 중요한 가치를 선택하세요.</div>
-                  <div className="answers-form">
-                    <div className="check-form">
-                      <label>
-                        <input
-                          type="radio"
-                          name={jsondata.qitemNo}
-                          className="form-check-input"
-                          value={jsondata.answerScore01}
-                        />
-                        {jsondata.answer01}
-                      </label>
-                    </div>
-                    <div className="check-form">
-                      <label>
-                        <input
-                          type="radio"
-                          name={jsondata.qitemNo}
-                          className="form-check-input"
-                          value={jsondata.answerScore02}
-                        />
-                        {jsondata.answer02}
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <br></br>
-              </>
-            );
-          })}
+          <QuestionContainer />
+          {/* <div
+            className="question-page"
+            id="group0"
+            style={{ display: questionPage === 0 ? 'block' : 'none' }}
+          >
+            {allocateQuestion(group[0])}
+          </div>
+          <div
+            className="question-page"
+            id="group1"
+            style={{ display: questionPage === 1 ? 'block' : 'none' }}
+          >
+            {allocateQuestion(group[1])}
+          </div>
+          <div
+            className="question-page"
+            id="group2"
+            style={{ display: questionPage === 2 ? 'block' : 'none' }}
+          >
+            {allocateQuestion(group[2])}
+          </div>
+          <div
+            className="question-page"
+            id="group3"
+            style={{ display: questionPage === 3 ? 'block' : 'none' }}
+          >
+            {allocateQuestion(group[3])}
+          </div>
+          <div
+            className="question-page"
+            id="group4"
+            style={{ display: questionPage === 4 ? 'block' : 'none' }}
+          >
+            {allocateQuestion(group[4])}
+          </div>
+          <div
+            className="question-page"
+            id="group5"
+            style={{ display: questionPage === 5 ? 'block' : 'none' }}
+          >
+            {allocateQuestion(group[5])}
+          </div>
+          <div
+            className="question-page"
+            id="group6"
+            style={{ display: questionPage === 6 ? 'block' : 'none' }}
+          >
+            {allocateQuestion(group[6])}
+          </div> */}
         </div>
         <div className="footer-container">
           <PreviousButton />
