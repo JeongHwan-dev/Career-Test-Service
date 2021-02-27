@@ -44,9 +44,14 @@ function Test() {
     console.log(`예시 문제 선택지: ${exAnswer}`);
   };
 
+  // const questionHandler = (event) => {
+  //   setAnswers(`${answers} ${event.currentTarget.value}`);
+  //   console.log(`검사자 선택 기록: ${answers}`);
+  // };
+
   // 현재 페이지로 다음 페이지로 넘기는 함수
   function nextPage() {
-    if (currentPage < 3 || questionPage === 6) {
+    if (currentPage < 3) {
       setCurrentPage(currentPage + 1);
       console.log(`현재 페이지 번호: ${currentPage}`);
     } else {
@@ -90,24 +95,24 @@ function Test() {
 
   useEffect(() => {
     getOpenAPI();
-    console.log(group);
+    console.log(questionGroup);
   }, []);
 
   // 질문 데이터 묶음 저장 그룹
-  var group = [];
+  var questionGroup = [];
 
   // OpenAPI 질문 데이터 4개씩 묶기
   for (var i = 0; i < data.length / 4; i++) {
-    group[i] = data.slice(i * 4, i * 4 + 4);
+    questionGroup[i] = data.slice(i * 4, i * 4 + 4);
   }
 
   // 한 개의 테스트 질문 페이지에 문제 할당하는 함수
-  function allocateQuestion(group) {
-    const page = group.map((jsonData, index) => {
+  function allocateQuestion(questionGroup) {
+    const page = questionGroup.map((jsonData, index) => {
       return (
         <>
           <div className="question-form">
-            <div>{jsonData.qitemNo}. 두 개 가치 중에 자신에게 더 중요한 가치를 선택하세요.</div>
+            <Question num={jsonData.qitemNo} />
             <div className="answers-form">
               <div className="check-form">
                 <label>
@@ -144,22 +149,22 @@ function Test() {
   function QuestionContainer() {
     // OpenAPI 질문 데이터 4개씩 묶기
     for (var i = 0; i < data.length / 4; i++) {
-      group[i] = data.slice(i * 4, i * 4 + 4);
+      questionGroup[i] = data.slice(i * 4, i * 4 + 4);
     }
-    if (group.length <= 0) {
+    if (questionGroup.length <= 0) {
       return <></>;
     }
     return (
       <>
-        {group.map((item, index) => {
+        {questionGroup.map((item, index) => {
           return (
             <>
               <div
                 className="question-page"
-                id={`group${index}`}
+                id={`questionGroup${index}`}
                 style={{ display: questionPage === index ? 'block' : 'none' }}
               >
-                {allocateQuestion(group[index])}
+                {allocateQuestion(questionGroup[index])}
               </div>
             </>
           );
@@ -181,9 +186,16 @@ function Test() {
 
   // 다음 버튼 컴포넌트
   function NextButton() {
+    if (questionPage === questionGroup.length - 1) {
+      return (
+        <button type="button" className="btn-outline-primary" onClick={moveResult}>
+          제출
+        </button>
+      );
+    }
     return (
       <button type="button" className="btn-outline-primary" onClick={nextPage}>
-        다음
+        다음&gt;
       </button>
     );
   }
@@ -192,18 +204,14 @@ function Test() {
   function PreviousButton() {
     return (
       <button type="button" className="btn-outline-primary" onClick={previousPage}>
-        이전
+        &lt;이전
       </button>
     );
   }
 
-  // 제출 버튼 컴포넌트
-  function SubmitButton() {
-    return (
-      <button type="button" className="btn-outline-primary" onClick={(moveResult, userData)}>
-        제출
-      </button>
-    );
+  // 질문 컴포넌트
+  function Question(props) {
+    return <div>{props.num}. 두 개의 가치 중에 자신에게 더 중요한 가치를 선택하세요.</div>;
   }
 
   return (
@@ -281,7 +289,7 @@ function Test() {
         </div>
         <h4>직업과 관련된 두개의 가치 중에서 자기에게 더 중요한 가치에 표시하세요.</h4>
         <div className="question-form">
-          <div>두 개의 가치 중에 자신에게 더 중요한 가치를 선택하세요.</div>
+          <Question num="ex" />
           <div className="answers-form">
             <div className="check-form">
               <label>
@@ -330,75 +338,10 @@ function Test() {
         </div>
         <div className="body-container">
           <QuestionContainer />
-          {/* <div
-            className="question-page"
-            id="group0"
-            style={{ display: questionPage === 0 ? 'block' : 'none' }}
-          >
-            {allocateQuestion(group[0])}
-          </div>
-          <div
-            className="question-page"
-            id="group1"
-            style={{ display: questionPage === 1 ? 'block' : 'none' }}
-          >
-            {allocateQuestion(group[1])}
-          </div>
-          <div
-            className="question-page"
-            id="group2"
-            style={{ display: questionPage === 2 ? 'block' : 'none' }}
-          >
-            {allocateQuestion(group[2])}
-          </div>
-          <div
-            className="question-page"
-            id="group3"
-            style={{ display: questionPage === 3 ? 'block' : 'none' }}
-          >
-            {allocateQuestion(group[3])}
-          </div>
-          <div
-            className="question-page"
-            id="group4"
-            style={{ display: questionPage === 4 ? 'block' : 'none' }}
-          >
-            {allocateQuestion(group[4])}
-          </div>
-          <div
-            className="question-page"
-            id="group5"
-            style={{ display: questionPage === 5 ? 'block' : 'none' }}
-          >
-            {allocateQuestion(group[5])}
-          </div>
-          <div
-            className="question-page"
-            id="group6"
-            style={{ display: questionPage === 6 ? 'block' : 'none' }}
-          >
-            {allocateQuestion(group[6])}
-          </div> */}
         </div>
         <div className="footer-container">
           <PreviousButton />
           <NextButton />
-        </div>
-      </div>
-      <div id="page4-submit" style={{ display: currentPage === 4 ? 'block' : 'none' }}>
-        <div className="header-container">
-          <div className="title">
-            <h2>수고하셨습니다. 검사가 완료되었습니다.</h2>
-          </div>
-        </div>
-        <div className="body-container">
-          <p>
-            검사결과는 여러분이 직업을 선택할 때 상대적으로 어떠한 가치를 중요하게 생각하는지를
-            알려주고, 중요 가치를 충족시켜줄 수 있는 직업에 대해 생각해 볼 기회를 제공합니다.
-          </p>
-        </div>
-        <div className="footer-container">
-          <SubmitButton />
         </div>
       </div>
     </div>
