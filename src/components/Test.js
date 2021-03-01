@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 import './css/Test.css';
 
 // 테스트 컴포넌트 (등록, 테스트)
@@ -9,23 +10,25 @@ function Test() {
   const [exAnswer, setExAnswer] = useState(false); // 예시 문항 선택 기록
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
   const [data, setData] = useState([{}]); // 질문 데이터 (JSON 배열)
-  const [answers, setAnswers] = useState(''); // 검사자 선택 기록 데이터
+  //const [answers, setAnswers] = useState({}); // 검사자 선택 기록 데이터
   const [questionPage, setQuestionPage] = useState(0); // 퀴즈 페이지
+  const [currentProgress, setCurrentProgress] = useState(0);
+  var answers = {};
 
   // 검사자 데이터 함수
-  function userData() {
-    const userResultData = {
-      apikey: '',
-      qestrnSeq: '6',
-      trgetSe: '100206',
-      name: userName,
-      gender: userGender,
-      grade: '2',
-      email: '',
-      startDtm: Date.now(),
-      answers: '',
-    };
-  }
+  // function userData() {
+  //   const userResultData = {
+  //     apikey: '',
+  //     qestrnSeq: '6',
+  //     trgetSe: '100206',
+  //     name: userName,
+  //     gender: userGender,
+  //     grade: '2',
+  //     email: '',
+  //     startDtm: Date.now(),
+  //     answers: '',
+  //   };
+  // }
 
   // 검사자 이름을 받아오는 핸들러
   const onNameHandler = (event) => {
@@ -42,6 +45,17 @@ function Test() {
   const onExampleHandler = (event) => {
     setExAnswer(event.currentTarget.value);
     console.log(`예시 문제 선택지: ${exAnswer}`);
+  };
+
+  const onCurrentProgressHandler = (event) => {
+    const checked = document.querySelectorAll(`input:checked`).length;
+    setCurrentProgress(checked);
+  };
+
+  const onAnswersHandler = (event) => {
+    answers[event.currentTarget.name] = event.currentTarget.value;
+    console.log(`answer = ${answers}`);
+    console.log(userName + userGender);
   };
 
   // const questionHandler = (event) => {
@@ -64,7 +78,7 @@ function Test() {
 
   // 현재 페이지를 이전 페이지로 되돌리는 함수
   function previousPage() {
-    if (currentPage < 3 || questionPage === 0) {
+    if (questionPage === 0) {
       setCurrentPage(currentPage - 1);
       console.log(`현재 페이지 번호: ${currentPage}`);
     } else {
@@ -106,14 +120,14 @@ function Test() {
     questionGroup[i] = data.slice(i * 4, i * 4 + 4);
   }
 
-  // 한 개의 테스트 질문 페이지에 문제 할당하는 함수
+  // 한 장의 테스트 질문 페이지에 문제 할당하는 함수
   function allocateQuestion(questionGroup) {
     const page = questionGroup.map((jsonData, index) => {
       return (
         <>
           <div className="question-form">
             <Question num={jsonData.qitemNo} />
-            <div className="answers-form">
+            <div className="answers-form" onChange={onCurrentProgressHandler}>
               <div className="check-form">
                 <label>
                   <input
@@ -138,14 +152,15 @@ function Test() {
               </div>
             </div>
           </div>
-          <br></br>
         </>
       );
     });
     return page;
   }
 
-  // 테스트 질문 컴포넌트
+  // 컴포넌트
+
+  // 테스트 선택지 컴포넌트
   function QuestionContainer() {
     // OpenAPI 질문 데이터 4개씩 묶기
     for (var i = 0; i < data.length / 4; i++) {
@@ -173,15 +188,32 @@ function Test() {
     );
   }
 
-  // 컴포넌트
-
   // 검사 시작 버튼 컴포넌트
   function StartButton() {
-    return (
-      <button type="button" className="btn-outline-primary" disabled={!exAnswer} onClick={nextPage}>
-        검사 시작
-      </button>
-    );
+    if (currentPage === 1) {
+      return (
+        <button
+          type="button"
+          className="btn-outline-primary"
+          id="user-start-btn"
+          disabled={!(userName && userGender)} // 검사자 정보 입력 확인
+          onClick={nextPage}
+        >
+          검사 시작
+        </button>
+      );
+    } else if (currentPage === 2) {
+      return (
+        <button
+          type="button"
+          className="btn-outline-primary"
+          disabled={!exAnswer} // 예시 문항 체크 여부 확인
+          onClick={nextPage}
+        >
+          검사 시작
+        </button>
+      );
+    }
   }
 
   // 다음 버튼 컴포넌트
@@ -195,7 +227,7 @@ function Test() {
     }
     return (
       <button type="button" className="btn-outline-primary" onClick={nextPage}>
-        다음&gt;
+        다음 &gt;
       </button>
     );
   }
@@ -204,14 +236,48 @@ function Test() {
   function PreviousButton() {
     return (
       <button type="button" className="btn-outline-primary" onClick={previousPage}>
-        &lt;이전
+        &lt; 이전
       </button>
     );
+  }
+
+  // 페이지 이동 버튼 컴포넌트
+  function ShiftingButton() {
+    if (currentPage === 1) {
+      return (
+        <>
+          <StartButton />
+        </>
+      );
+    } else if (currentPage === 2) {
+      return (
+        <>
+          <PreviousButton />
+          <StartButton />
+        </>
+      );
+    } else {
+      return (
+        <>
+          <PreviousButton />
+          <NextButton />
+        </>
+      );
+    }
   }
 
   // 질문 컴포넌트
   function Question(props) {
     return <div>{props.num}. 두 개의 가치 중에 자신에게 더 중요한 가치를 선택하세요.</div>;
+  }
+
+  // 진행도 바 컴포넌트
+  function ProgressComponent() {
+    return (
+      <>
+        <ProgressBar currentProgress={currentProgress} label={`${currentProgress}%`} />
+      </>
+    );
   }
 
   return (
@@ -227,6 +293,7 @@ function Test() {
               className="form-control"
               value={userName}
               onChange={onNameHandler}
+              placeholder="홍길동"
             />
           </label>
         </div>
@@ -262,15 +329,7 @@ function Test() {
           </div>
         </div>
         <div>
-          <button
-            type="button"
-            className="btn-outline-primary"
-            id="user-start-btn"
-            disabled={!(userGender && userName)}
-            onClick={nextPage}
-          >
-            검사 시작
-          </button>
+          <ShiftingButton />
         </div>
       </div>
       <div id="page2-example" style={{ display: currentPage === 2 ? 'block' : 'none' }}>
@@ -280,11 +339,11 @@ function Test() {
               <h2>검사 예시</h2>
             </div>
             <div>
-              <h3>0%</h3>
+              <h3>{currentProgress}%</h3>
             </div>
           </div>
-          <div className="progress">
-            <p>-------</p>
+          <div className="status">
+            <ProgressComponent />
           </div>
         </div>
         <h4>직업과 관련된 두개의 가치 중에서 자기에게 더 중요한 가치에 표시하세요.</h4>
@@ -318,8 +377,7 @@ function Test() {
           </div>
         </div>
         <div className="footer-container">
-          <PreviousButton />
-          <StartButton />
+          <ShiftingButton />
         </div>
       </div>
       <div id="page3-test" style={{ display: currentPage === 3 ? 'block' : 'none' }}>
@@ -329,19 +387,18 @@ function Test() {
               <h2>검사 진행</h2>
             </div>
             <div>
-              <h3>0%</h3>
+              <h3>{currentProgress}%</h3>
             </div>
           </div>
-          <div className="progress">
-            <p>-------</p>
+          <div className="status">
+            <ProgressComponent />
           </div>
         </div>
         <div className="body-container">
           <QuestionContainer />
         </div>
         <div className="footer-container">
-          <PreviousButton />
-          <NextButton />
+          <ShiftingButton />
         </div>
       </div>
     </div>
