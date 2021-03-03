@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ProgressBar from 'react-bootstrap/ProgressBar';
 import './css/Test.css';
 
 // 테스트 컴포넌트 (등록, 테스트)
@@ -8,12 +7,11 @@ function Test() {
   const [userName, setUserName] = useState(''); // 검사자 이름
   const [userGender, setUserGender] = useState(false); // 검사자 성별
   const [exAnswer, setExAnswer] = useState(false); // 예시 문항 선택 기록
-  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
+  const [answers, setAnswers] = useState([]); // 검사자 선택 기록 데이터
   const [data, setData] = useState([{}]); // 질문 데이터 (JSON 배열)
-  //const [answers, setAnswers] = useState({}); // 검사자 선택 기록 데이터
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
   const [questionPage, setQuestionPage] = useState(0); // 퀴즈 페이지
-  const [currentProgress, setCurrentProgress] = useState(0);
-  var answers = {};
+  const [currentProgress, setCurrentProgress] = useState(0); // 진행도 바
 
   // 검사자 데이터 함수
   // function userData() {
@@ -30,68 +28,44 @@ function Test() {
   //   };
   // }
 
-  // 검사자 이름을 받아오는 핸들러
+  // 검사자 이름 설정 핸들러
   const onNameHandler = (event) => {
     setUserName(event.currentTarget.value);
     console.log(`검사자 이름: ${userName}`);
   };
 
-  // 검사자 성별을 받아오는 핸들러
+  // 검사자 성별 설정 핸들러
   const onGenderHandler = (event) => {
     setUserGender(event.currentTarget.value);
     console.log(`성별 코드: ${userGender}`);
   };
 
+  // 예시 문제 진행 확인 핸들러
   const onExampleHandler = (event) => {
     setExAnswer(event.currentTarget.value);
     console.log(`예시 문제 선택지: ${exAnswer}`);
   };
 
-  const onCurrentProgressHandler = (event) => {
-    const checked = document.querySelectorAll(`input:checked`).length;
-    setCurrentProgress(checked);
+  // 진행도 핸들러
+  const onProgressHandler = (event) => {
+    const checked = document.querySelectorAll(`input:checked`).length; // 체크 개수 확인
+    setCurrentProgress(Math.ceil((100 / 28) * (checked - 2)));
   };
 
-  const onAnswersHandler = (event) => {
-    answers[event.currentTarget.name] = event.currentTarget.value;
-    console.log(`answer = ${answers}`);
-    console.log(userName + userGender);
-  };
-
-  // const questionHandler = (event) => {
-  //   setAnswers(`${answers} ${event.currentTarget.value}`);
-  //   console.log(`검사자 선택 기록: ${answers}`);
-  // };
-
-  // 현재 페이지로 다음 페이지로 넘기는 함수
-  function nextPage() {
-    if (currentPage < 3) {
-      setCurrentPage(currentPage + 1);
-      console.log(`현재 페이지 번호: ${currentPage}`);
-    } else {
-      setQuestionPage(questionPage + 1);
-      console.log(`현재 퀴즈 페이지 번호: ${questionPage}`);
-    }
-
-    console.log(`현재 페이지 번호: ${currentPage}`);
+  function ProgressBar() {
+    return (
+      <div className="progress">
+        <div
+          className="progress-bar"
+          role="progressbar"
+          style={{ width: `${currentProgress}%` }}
+          aria-valuenow="100"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        ></div>
+      </div>
+    );
   }
-
-  // 현재 페이지를 이전 페이지로 되돌리는 함수
-  function previousPage() {
-    if (questionPage === 0) {
-      setCurrentPage(currentPage - 1);
-      console.log(`현재 페이지 번호: ${currentPage}`);
-    } else {
-      setQuestionPage(questionPage - 1);
-      console.log(`현재 퀴즈 페이지 번호: ${questionPage}`);
-    }
-  }
-
-  // 결과 페이지로 이동하는 함수
-  function moveResult() {
-    window.location.href = '#/result';
-  }
-
   // OpenAPI 데이터를 가져오는 함수
   function getOpenAPI() {
     const url =
@@ -109,7 +83,7 @@ function Test() {
 
   useEffect(() => {
     getOpenAPI();
-    console.log(questionGroup);
+    console.log(data);
   }, []);
 
   // 질문 데이터 묶음 저장 그룹
@@ -121,13 +95,13 @@ function Test() {
   }
 
   // 한 장의 테스트 질문 페이지에 문제 할당하는 함수
-  function allocateQuestion(questionGroup) {
-    const page = questionGroup.map((jsonData, index) => {
+  function allocateQuestion(group) {
+    const page = group.map((jsonData, index) => {
       return (
         <>
           <div className="question-form">
             <Question num={jsonData.qitemNo} />
-            <div className="answers-form" onChange={onCurrentProgressHandler}>
+            <div className="answers-form">
               <div className="check-form">
                 <label>
                   <input
@@ -158,35 +132,39 @@ function Test() {
     return page;
   }
 
-  // 컴포넌트
-
-  // 테스트 선택지 컴포넌트
-  function QuestionContainer() {
-    // OpenAPI 질문 데이터 4개씩 묶기
-    for (var i = 0; i < data.length / 4; i++) {
-      questionGroup[i] = data.slice(i * 4, i * 4 + 4);
-    }
-    if (questionGroup.length <= 0) {
-      return <></>;
-    }
-    return (
-      <>
-        {questionGroup.map((item, index) => {
-          return (
-            <>
-              <div
-                className="question-page"
-                id={`questionGroup${index}`}
-                style={{ display: questionPage === index ? 'block' : 'none' }}
-              >
-                {allocateQuestion(questionGroup[index])}
-              </div>
-            </>
-          );
-        })}
-      </>
-    );
+  // 답변 취합 함수
+  function collectAnswers() {
+    const userAnswers = document.getElementById('test-container').querySelector('input:checked');
   }
+
+  // 현재 페이지로 다음 페이지로 넘기는 함수
+  function nextPage() {
+    if (currentPage < 3) {
+      setCurrentPage(currentPage + 1);
+      console.log(`현재 페이지 번호: ${currentPage}`);
+    } else {
+      setQuestionPage(questionPage + 1);
+      console.log(`현재 퀴즈 페이지 번호: ${questionPage}`);
+    }
+  }
+
+  // 현재 페이지를 이전 페이지로 되돌리는 함수
+  function previousPage() {
+    if (questionPage === 0) {
+      setCurrentPage(currentPage - 1);
+      console.log(`현재 페이지 번호: ${currentPage}`);
+    } else {
+      setQuestionPage(questionPage - 1);
+      console.log(`현재 퀴즈 페이지 번호: ${questionPage}`);
+    }
+  }
+
+  // 결과 페이지로 이동하는 함수
+  function moveResult() {
+    window.location.href = '#/result';
+  }
+
+  // 컴포넌트
 
   // 검사 시작 버튼 컴포넌트
   function StartButton() {
@@ -220,7 +198,12 @@ function Test() {
   function NextButton() {
     if (questionPage === questionGroup.length - 1) {
       return (
-        <button type="button" className="btn-outline-primary" onClick={moveResult}>
+        <button
+          type="button"
+          className="btn-outline-primary"
+          onClick={moveResult}
+          disabled={currentProgress < 100}
+        >
           제출
         </button>
       );
@@ -269,15 +252,6 @@ function Test() {
   // 질문 컴포넌트
   function Question(props) {
     return <div>{props.num}. 두 개의 가치 중에 자신에게 더 중요한 가치를 선택하세요.</div>;
-  }
-
-  // 진행도 바 컴포넌트
-  function ProgressComponent() {
-    return (
-      <>
-        <ProgressBar currentProgress={currentProgress} label={`${currentProgress}%`} />
-      </>
-    );
   }
 
   return (
@@ -338,12 +312,12 @@ function Test() {
             <div>
               <h2>검사 예시</h2>
             </div>
-            <div>
+            <div className="progress-num">
               <h3>{currentProgress}%</h3>
             </div>
           </div>
-          <div className="status">
-            <ProgressComponent />
+          <div className="progress-bar">
+            <ProgressBar />
           </div>
         </div>
         <h4>직업과 관련된 두개의 가치 중에서 자기에게 더 중요한 가치에 표시하세요.</h4>
@@ -386,16 +360,28 @@ function Test() {
             <div>
               <h2>검사 진행</h2>
             </div>
-            <div>
+            <div className="progress-num">
               <h3>{currentProgress}%</h3>
             </div>
           </div>
-          <div className="status">
-            <ProgressComponent />
+          <div className="progress-bar">
+            <ProgressBar />
           </div>
         </div>
-        <div className="body-container">
-          <QuestionContainer />
+        <div className="body-container" id="test-container" onChange={onProgressHandler}>
+          {questionGroup.map((item, index) => {
+            return (
+              <>
+                <div
+                  className="question-group"
+                  id={`questionGroup${index}`}
+                  style={{ display: questionPage === index ? 'block' : 'none' }}
+                >
+                  {allocateQuestion(questionGroup[index])}
+                </div>
+              </>
+            );
+          })}
         </div>
         <div className="footer-container">
           <ShiftingButton />

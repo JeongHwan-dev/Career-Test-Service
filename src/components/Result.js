@@ -7,7 +7,7 @@ function Result() {
     <>
       <div className="header-container">
         <div className="title">
-          <h2>수고하셨습니다. 검사가 완료되었습니다.</h2>
+          <h2>검사가 완료되었습니다.</h2>
         </div>
       </div>
       <div className="body-container">
