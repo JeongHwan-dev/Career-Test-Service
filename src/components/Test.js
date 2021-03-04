@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import './css/Test.css';
+
+var answersArray = []; // 검사자 응답 정보 데이터 배열 (가공전)
 
 // 테스트 컴포넌트 (등록, 테스트)
 function Test() {
@@ -11,7 +14,9 @@ function Test() {
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
   const [questionPage, setQuestionPage] = useState(0); // 퀴즈 페이지
   const [currentProgress, setCurrentProgress] = useState(0); // 진행도 바
-  let answers = ''; // 검사자 선택 기록 데이터
+  const [resultURL, setResultURL] = useState(''); // 결과 페이지 url 정보
+  const history = useHistory;
+  let userAnswers = ''; // 검사자 응답 정보 데이터
 
   // 검사자 이름 설정 핸들러
   const onNameHandler = (event) => {
@@ -39,15 +44,12 @@ function Test() {
 
   // 검사자 응답 정보 취합 핸들러
   const onAnswersHandler = () => {
-    const answersInputs = document
-      .getElementById('test-container')
-      .querySelectorAll('input:checked');
-    for (var i = 0; i < answersInputs.length; i++) {
-      answers += `${answersInputs[i].name}=${answersInputs[i].value} `;
+    for (var i = 1; i < answersArray.length; i++) {
+      userAnswers += `B${i}=${answersArray[i]} `;
     }
-    console.log(`검사자 응답 정보: ${answers}`);
   };
 
+  // 진행도 바 함수
   function ProgressBar() {
     return (
       <div className="progress">
@@ -62,6 +64,7 @@ function Test() {
       </div>
     );
   }
+
   // OpenAPI 데이터를 가져오는 함수
   function getOpenAPI() {
     const url =
@@ -90,6 +93,31 @@ function Test() {
     questionGroup[i] = data.slice(i * 4, i * 4 + 4);
   }
 
+  // 결과 URL 요청 함수
+  function postOpenAPI() {
+    const reportURL = 'http://www.career.go.kr/inspct/openapi/test/report';
+    const userData = {
+      apikey: '08eff82361010e36e469cf5353765658',
+      qestrnSeq: '6',
+      trgetSe: '100209',
+      name: userName,
+      gender: userGender,
+      grade: '1',
+      startDtm: new Date().getTime(),
+      answers: userAnswers,
+    };
+    axios.post(reportURL, userData).then((response) => {
+      // 질문. 왜 setResultURL() 함수로 resultURL에 url데이터를 넣어도
+      // 콘솔로 확인했을 때 빈 값이 나오는지 이유가 궁금합니다.
+      setResultURL(response.data.RESULT.url);
+      console.log(`Result Page: ${response.data.RESULT.url}`);
+
+      // =============== 빈 값 출력 =====================
+      console.log(`ResultURL: ${resultURL}`);
+      // =============== 빈 값 출력 =====================
+    });
+  }
+
   // 한 장의 테스트 질문 페이지에 문제 할당하는 함수
   function allocateQuestion(group) {
     const page = group.map((jsonData, index) => {
@@ -105,6 +133,12 @@ function Test() {
                     name={`B${jsonData.qitemNo}`}
                     className="form-check-input"
                     value={jsonData.answerScore01}
+                    onChange={() => {
+                      answersArray[jsonData.qitemNo] = jsonData.answerScore01;
+                      console.log(
+                        `SET: Answer[${jsonData.qitemNo}] = ${answersArray[jsonData.qitemNo]}`,
+                      );
+                    }}
                   />
                   {jsonData.answer01}
                 </label>
@@ -116,6 +150,12 @@ function Test() {
                     name={`B${jsonData.qitemNo}`}
                     className="form-check-input"
                     value={jsonData.answerScore02}
+                    onChange={() => {
+                      answersArray[jsonData.qitemNo] = jsonData.answerScore02;
+                      console.log(
+                        `SET: Answer[${jsonData.qitemNo}] = ${answersArray[jsonData.qitemNo]}`,
+                      );
+                    }}
                   />
                   {jsonData.answer02}
                 </label>
@@ -132,10 +172,10 @@ function Test() {
   function nextPage() {
     if (currentPage < 3) {
       setCurrentPage(currentPage + 1);
-      console.log(`현재 페이지 번호: ${currentPage}`);
+      console.log(`MOVE: Main Page ${currentPage} => ${currentPage + 1}(now)`);
     } else {
       setQuestionPage(questionPage + 1);
-      console.log(`현재 퀴즈 페이지 번호: ${questionPage}`);
+      console.log(`MOVE: Test Page ${questionPage + 1} => ${questionPage + 2}(now)`);
     }
   }
 
@@ -143,10 +183,10 @@ function Test() {
   function previousPage() {
     if (questionPage === 0) {
       setCurrentPage(currentPage - 1);
-      console.log(`현재 페이지 번호: ${currentPage}`);
+      console.log(`MOVE: Main Page ${currentPage} => ${currentPage - 1}(now)`);
     } else {
       setQuestionPage(questionPage - 1);
-      console.log(`현재 퀴즈 페이지 번호: ${questionPage}`);
+      console.log(`MOVE: Test Page ${questionPage + 1} => ${questionPage}(now)`);
     }
   }
 
@@ -195,6 +235,8 @@ function Test() {
           onClick={() => {
             moveResult();
             onAnswersHandler();
+            console.log(`userAnswers: ${userAnswers}`);
+            postOpenAPI();
           }}
           disabled={currentProgress < 100}
         >
