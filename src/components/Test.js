@@ -7,26 +7,11 @@ function Test() {
   const [userName, setUserName] = useState(''); // 검사자 이름
   const [userGender, setUserGender] = useState(false); // 검사자 성별
   const [exAnswer, setExAnswer] = useState(false); // 예시 문항 선택 기록
-  const [answers, setAnswers] = useState([]); // 검사자 선택 기록 데이터
   const [data, setData] = useState([{}]); // 질문 데이터 (JSON 배열)
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
   const [questionPage, setQuestionPage] = useState(0); // 퀴즈 페이지
   const [currentProgress, setCurrentProgress] = useState(0); // 진행도 바
-
-  // 검사자 데이터 함수
-  // function userData() {
-  //   const userResultData = {
-  //     apikey: '',
-  //     qestrnSeq: '6',
-  //     trgetSe: '100206',
-  //     name: userName,
-  //     gender: userGender,
-  //     grade: '2',
-  //     email: '',
-  //     startDtm: Date.now(),
-  //     answers: '',
-  //   };
-  // }
+  let answers = ''; // 검사자 선택 기록 데이터
 
   // 검사자 이름 설정 핸들러
   const onNameHandler = (event) => {
@@ -47,9 +32,20 @@ function Test() {
   };
 
   // 진행도 핸들러
-  const onProgressHandler = (event) => {
+  const onProgressHandler = () => {
     const checked = document.querySelectorAll(`input:checked`).length; // 체크 개수 확인
     setCurrentProgress(Math.ceil((100 / 28) * (checked - 2)));
+  };
+
+  // 검사자 응답 정보 취합 핸들러
+  const onAnswersHandler = () => {
+    const answersInputs = document
+      .getElementById('test-container')
+      .querySelectorAll('input:checked');
+    for (var i = 0; i < answersInputs.length; i++) {
+      answers += `${answersInputs[i].name}=${answersInputs[i].value} `;
+    }
+    console.log(`검사자 응답 정보: ${answers}`);
   };
 
   function ProgressBar() {
@@ -132,11 +128,6 @@ function Test() {
     return page;
   }
 
-  // 답변 취합 함수
-  function collectAnswers() {
-    const userAnswers = document.getElementById('test-container').querySelector('input:checked');
-  }
-
   // 현재 페이지로 다음 페이지로 넘기는 함수
   function nextPage() {
     if (currentPage < 3) {
@@ -201,7 +192,10 @@ function Test() {
         <button
           type="button"
           className="btn-outline-primary"
-          onClick={moveResult}
+          onClick={() => {
+            moveResult();
+            onAnswersHandler();
+          }}
           disabled={currentProgress < 100}
         >
           제출
