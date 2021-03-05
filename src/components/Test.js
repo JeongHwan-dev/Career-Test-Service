@@ -15,25 +15,22 @@ function Test() {
   const [questionPage, setQuestionPage] = useState(0); // 퀴즈 페이지
   const [currentProgress, setCurrentProgress] = useState(0); // 진행도 바
   const [resultURL, setResultURL] = useState(''); // 결과 페이지 url 정보
-  const history = useHistory;
+  const history = useHistory();
   let userAnswers = ''; // 검사자 응답 정보 데이터
 
   // 검사자 이름 설정 핸들러
   const onNameHandler = (event) => {
     setUserName(event.currentTarget.value);
-    console.log(`검사자 이름: ${userName}`);
   };
 
   // 검사자 성별 설정 핸들러
   const onGenderHandler = (event) => {
     setUserGender(event.currentTarget.value);
-    console.log(`성별 코드: ${userGender}`);
   };
 
   // 예시 문제 진행 확인 핸들러
   const onExampleHandler = (event) => {
     setExAnswer(event.currentTarget.value);
-    console.log(`예시 문제 선택지: ${exAnswer}`);
   };
 
   // 진행도 핸들러
@@ -49,21 +46,15 @@ function Test() {
     }
   };
 
-  // 진행도 바 함수
-  function ProgressBar() {
-    return (
-      <div className="progress">
-        <div
-          className="progress-bar"
-          role="progressbar"
-          style={{ width: `${currentProgress}%` }}
-          aria-valuenow="100"
-          aria-valuemin="0"
-          aria-valuemax="100"
-        ></div>
-      </div>
-    );
-  }
+  // 결과 페이지 URL result 페이지로 보내는 핸들러
+  const onURLHandler = () => {
+    history.push({
+      pathname: '/result',
+      state: {
+        resultURL: resultURL,
+      },
+    });
+  };
 
   // OpenAPI 데이터를 가져오는 함수
   function getOpenAPI() {
@@ -107,14 +98,8 @@ function Test() {
       answers: userAnswers,
     };
     axios.post(reportURL, userData).then((response) => {
-      // 질문. 왜 setResultURL() 함수로 resultURL에 url데이터를 넣어도
-      // 콘솔로 확인했을 때 빈 값이 나오는지 이유가 궁금합니다.
       setResultURL(response.data.RESULT.url);
       console.log(`Result Page: ${response.data.RESULT.url}`);
-
-      // =============== 빈 값 출력 =====================
-      console.log(`ResultURL: ${resultURL}`);
-      // =============== 빈 값 출력 =====================
     });
   }
 
@@ -170,7 +155,7 @@ function Test() {
 
   // 현재 페이지로 다음 페이지로 넘기는 함수
   function nextPage() {
-    if (currentPage < 3) {
+    if (currentPage < 3 || questionPage === 6) {
       setCurrentPage(currentPage + 1);
       console.log(`MOVE: Main Page ${currentPage} => ${currentPage + 1}(now)`);
     } else {
@@ -190,12 +175,23 @@ function Test() {
     }
   }
 
-  // 결과 페이지로 이동하는 함수
-  function moveResult() {
-    window.location.href = '#/result';
-  }
-
   // 컴포넌트
+
+  // 진행도 바 컴포넌트
+  function ProgressBar() {
+    return (
+      <div className="progress">
+        <div
+          className="progress-bar"
+          role="progressbar"
+          style={{ width: `${currentProgress}%` }}
+          aria-valuenow="100"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        ></div>
+      </div>
+    );
+  }
 
   // 검사 시작 버튼 컴포넌트
   function StartButton() {
@@ -206,7 +202,11 @@ function Test() {
           className="btn-outline-primary"
           id="user-start-btn"
           disabled={!(userName && userGender)} // 검사자 정보 입력 확인
-          onClick={nextPage}
+          onClick={() => {
+            nextPage();
+            console.log(`User name: ${userName}`);
+            console.log(`User gender: ${userGender}`);
+          }}
         >
           검사 시작
         </button>
@@ -217,7 +217,10 @@ function Test() {
           type="button"
           className="btn-outline-primary"
           disabled={!exAnswer} // 예시 문항 체크 여부 확인
-          onClick={nextPage}
+          onClick={() => {
+            nextPage();
+            console.log(`Example answer = ${exAnswer}`);
+          }}
         >
           검사 시작
         </button>
@@ -233,7 +236,7 @@ function Test() {
           type="button"
           className="btn-outline-primary"
           onClick={() => {
-            moveResult();
+            nextPage();
             onAnswersHandler();
             console.log(`userAnswers: ${userAnswers}`);
             postOpenAPI();
@@ -421,6 +424,25 @@ function Test() {
         </div>
         <div className="footer-container">
           <ShiftingButton />
+        </div>
+      </div>
+      <div id="page4-end" style={{ display: currentPage === 4 ? 'block' : 'none' }}>
+        <div className="header-container">
+          <div className="title">
+            <h2>검사가 완료되었습니다.</h2>
+          </div>
+        </div>
+        <div className="body-container">
+          <p>
+            검사결과는 여러분이 직업을 선택할 때 상대적으로 어떠한 가치를 중요하게 생각하는지를
+            알려주고, 중요 가치를 충족시켜줄 수 있는 직업에 대해 생각해 볼 기회를 제공합니다.
+          </p>
+          <p>{resultURL}</p>
+        </div>
+        <div className="footer-container">
+          <button type="button" className="btn-outline-primary" onClick={onURLHandler}>
+            결과 보기
+          </button>
         </div>
       </div>
     </div>
