@@ -47,14 +47,14 @@ function Test() {
   };
 
   // 결과 페이지 URL result 페이지로 보내는 핸들러
-  const onURLHandler = () => {
-    history.push({
-      pathname: '/result',
-      state: {
-        resultURL: resultURL,
-      },
-    });
-  };
+  // const onURLHandler = () => {
+  //   history.push({
+  //     pathname: '/result',
+  //     state: {
+  //       resultURL: resultURL,
+  //     },
+  //   });
+  // };
 
   // OpenAPI 데이터를 가져오는 함수
   function getOpenAPI() {
@@ -298,7 +298,7 @@ function Test() {
       <div id="page1-registration" style={{ display: currentPage === 1 ? 'block' : 'none' }}>
         <h2>직업가치관검사</h2>
         <div className="form-group">
-          <label>
+          <label className="form-check-label">
             이름
             <input
               name="name"
@@ -310,10 +310,10 @@ function Test() {
             />
           </label>
         </div>
-        <div className="form-group">
-          <label>성별</label>
+        <div className="form-group-gender">
+          <label className="form-check-label">성별</label>
           <div>
-            <div>
+            <div className="gender-form">
               <label className="form-check-label">
                 <input
                   name="gender"
@@ -326,7 +326,7 @@ function Test() {
                 남성
               </label>
             </div>
-            <div>
+            <div className="gender-form">
               <label className="form-check-label">
                 <input
                   name="gender"
@@ -440,7 +440,18 @@ function Test() {
           <p>{resultURL}</p>
         </div>
         <div className="footer-container">
-          <button type="button" className="btn-outline-primary" onClick={onURLHandler}>
+          <button
+            type="button"
+            className="btn-outline-primary"
+            onClick={() => {
+              history.push({
+                pathname: '/result',
+                state: {
+                  resultURL: resultURL,
+                },
+              });
+            }}
+          >
             결과 보기
           </button>
         </div>
