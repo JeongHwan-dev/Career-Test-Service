@@ -111,7 +111,7 @@ function Test() {
           <div className="question-form">
             <Question num={jsonData.qitemNo} />
             <div className="answers-form">
-              <div className="check-form">
+              <div className="check-form1">
                 <label>
                   <input
                     type="radio"
@@ -128,7 +128,7 @@ function Test() {
                   {jsonData.answer01}
                 </label>
               </div>
-              <div className="check-form">
+              <div className="check-form2">
                 <label>
                   <input
                     type="radio"
@@ -215,7 +215,7 @@ function Test() {
       return (
         <button
           type="button"
-          className="btn-outline-primary"
+          className="btn-right"
           disabled={!exAnswer} // 예시 문항 체크 여부 확인
           onClick={() => {
             nextPage();
@@ -234,7 +234,7 @@ function Test() {
       return (
         <button
           type="button"
-          className="btn-outline-primary"
+          className="btn-right"
           onClick={() => {
             nextPage();
             onAnswersHandler();
@@ -248,7 +248,7 @@ function Test() {
       );
     }
     return (
-      <button type="button" className="btn-outline-primary" onClick={nextPage}>
+      <button type="button" className="btn-right" onClick={nextPage}>
         다음 &gt;
       </button>
     );
@@ -294,7 +294,7 @@ function Test() {
   }
 
   return (
-    <div id="root">
+    <div className="root">
       <div id="page1-registration" style={{ display: currentPage === 1 ? 'block' : 'none' }}>
         <h2>직업가치관검사</h2>
         <div className="form-group">
@@ -341,7 +341,7 @@ function Test() {
             </div>
           </div>
         </div>
-        <div>
+        <div className="button-form">
           <ShiftingButton />
         </div>
       </div>

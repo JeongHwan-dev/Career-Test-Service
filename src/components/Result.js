@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useDebugValue } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import {
@@ -9,6 +9,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from 'recharts';
+import './css/Result.css';
 
 function Result() {
   const location = useLocation();
@@ -65,6 +66,7 @@ function Result() {
 
   useEffect(() => {
     let subjectData = [];
+    let no = [];
     if (score != ' ') {
       for (var i = 0; i < score.length - 1; i++) {
         subjectData.push({
@@ -72,14 +74,16 @@ function Result() {
           A: parseInt(score[i].split('=')[1]) * 20,
           fullMark: 100,
         });
+        no.push(parseInt(score[i].split('=')[1]));
       }
+
       setData(subjectData);
     }
   }, [score]);
 
   return (
     <>
-      <div id="root">
+      <div className="root">
         <div className="header-container">
           <div className="title">
             <h2>직업가치관검사 결과표</h2>
@@ -129,8 +133,39 @@ function Result() {
             <br />
             <br />
             <div>
+              <div>
+                <h3>
+                  <strong>각각의 가치관이 갖는 의미는 다음과 같습니다.</strong>
+                </h3>
+                <br />
+              </div>
+              <div>
+                <strong>능력발휘</strong>
+                <tbody>
+                  <tr>
+                    <th scope="row">특징</th>
+                    <td>나의 능력을 충분히 발휘할 수 있을 때 보람과 만족을 느낍니다.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">직업선택</th>
+                    <td>
+                      나는 나의 능력을 충분히 발휘할 수 있는 기회와 가능성이 주어지는 직업을 선택할
+                      것입니다.
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">직업생활</th>
+                    <td>
+                      직업생활에서의 경쟁은 나를 도전적으로 만들어주고, 어려운 일을 하나씩 해결해
+                      나가는 과정에서 성취감을 느낄 것 입니다.
+                    </td>
+                  </tr>
+                </tbody>
+              </div>
+            </div>
+            <br />
+            <div>
               <h3>가치관과 관련이 높은 직업</h3>
-              <h3>{score}</h3>
             </div>
           </div>
         </div>
