@@ -348,7 +348,7 @@ function Test() {
       <div id="page2-example" style={{ display: currentPage === 2 ? 'block' : 'none' }}>
         <div className="header-container">
           <div className="title">
-            <div>
+            <div className="progress-title">
               <h2>검사 예시</h2>
             </div>
             <div className="progress-num">
@@ -397,7 +397,7 @@ function Test() {
       <div id="page3-test" style={{ display: currentPage === 3 ? 'block' : 'none' }}>
         <div className="header-container">
           <div className="title">
-            <div>
+            <div className="progress-title">
               <h2>검사 진행</h2>
             </div>
             <div className="progress-num">

@@ -1,5 +1,5 @@
 .root {
-  padding-top: 30px;
+  padding-top: 25px;
   width: 1000px;
   height: 1000px;
   margin: 0 auto;
@@ -60,4 +60,8 @@ table.type09 td {
 
 .report-link {
   text-align: center;
+}
+
+.progress-title {
+  float: left;
 }
