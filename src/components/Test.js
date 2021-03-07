@@ -359,6 +359,7 @@ function Test() {
             <ProgressBar />
           </div>
         </div>
+        <br />
         <h4>직업과 관련된 두개의 가치 중에서 자기에게 더 중요한 가치에 표시하세요.</h4>
         <div className="question-form">
           <Question num="ex" />
@@ -428,21 +429,24 @@ function Test() {
       </div>
       <div id="page4-end" style={{ display: currentPage === 4 ? 'block' : 'none' }}>
         <div className="header-container">
-          <div className="title">
-            <h2>검사가 완료되었습니다.</h2>
+          <div className="result-title">
+            <h1>검사가 완료되었습니다.</h1>
+            <hr />
           </div>
+          <br />
         </div>
         <div className="body-container">
           <p>
             검사결과는 여러분이 직업을 선택할 때 상대적으로 어떠한 가치를 중요하게 생각하는지를
             알려주고, 중요 가치를 충족시켜줄 수 있는 직업에 대해 생각해 볼 기회를 제공합니다.
           </p>
-          <p>{resultURL}</p>
+          <br />
+          <br />
         </div>
         <div className="footer-container">
           <button
             type="button"
-            className="btn-outline-primary"
+            className="btn-show-report"
             onClick={() => {
               history.push({
                 pathname: '/result',

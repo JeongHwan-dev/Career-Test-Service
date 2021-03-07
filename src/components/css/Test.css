@@ -57,15 +57,9 @@ h3 {
   font-weight: normal;
 }
 
-/* input[type='text'] {
-  float: center;
-  width: 150px;
-  height: 50px;
-  border: 1px solid #aaa;
-  border-radius: 5px;
-  padding: 5px;
-  margin: 10px 0;
-} */
+.result-title {
+  text-align: center;
+}
 
 .form-check-label {
   margin: 0;
@@ -164,4 +158,17 @@ button {
 
 .btn-right {
   float: right;
+}
+
+.progress-num {
+  line-height: 200px;
+  height: 50px;
+  text-align: right;
+}
+
+.btn-show-report {
+  position: relative;
+  left: 45%;
+  color: green;
+  border-color: green;
 }

@@ -4,3 +4,60 @@
   height: 1000px;
   margin: 0 auto;
 }
+
+.report-title {
+  text-align: center;
+}
+
+table.type09 {
+  border-collapse: collapse;
+  text-align: left;
+  line-height: 1.5;
+}
+table.type09 thead th {
+  padding: 10px;
+  font-weight: bold;
+  vertical-align: top;
+  color: #369;
+  border-bottom: 3px solid #036;
+}
+table.type09 tbody th {
+  width: 150px;
+  padding: 10px;
+  font-weight: bold;
+  vertical-align: top;
+  border-bottom: 1px solid #ccc;
+  background: #f3f6f7;
+}
+table.type09 td {
+  width: 1000px;
+  padding: 10px;
+  vertical-align: top;
+  border-bottom: 1px solid #ccc;
+}
+
+.description-form {
+  background-color: #f8f9fa;
+  background-clip: border-box;
+  width: 100%;
+  padding: 15px;
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+  text-align: center;
+}
+
+.radarChart-form {
+  position: relative;
+  left: 20%;
+}
+
+.btn-restart {
+  position: relative;
+  left: 45%;
+  color: green;
+  border-color: green;
+}
+
+.report-link {
+  text-align: center;
+}
