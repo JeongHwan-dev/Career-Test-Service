@@ -17,7 +17,7 @@ function Result() {
   const [gender, setGender] = useState(''); // 검사자 성별
   const [date, setDate] = useState(''); // 검사일
   const [score, setScore] = useState([]); // 검사 결과 점수
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]); // 항목 점수 데이터
   const subject = [
     '능력발휘',
     '자율성',
@@ -33,6 +33,7 @@ function Result() {
     getResultData();
   }, []);
 
+  // 결과지 데이터 가져오는 함수
   function getResultData() {
     const seq = location.state.resultURL.split('seq=').pop();
     const jsonReportURL = `https://inspct.career.go.kr/inspct/api/psycho/report?seq=${seq}`;
