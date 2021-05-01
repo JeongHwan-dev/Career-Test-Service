@@ -1,19 +1,24 @@
 # :clipboard: ​직업 심리 검사 서비스
 
-## 프로젝트 설명
+## 1. 프로젝트 설명
 
 [직업심리검사 API](https://www.career.go.kr/cnet/front/openapi/openApiTestCenter.do)를 사용하여 사용자의 직업 적합도를 확인할 수 있는 웹 서비스
 
-- 직업 가치관 검사 사이트를 구현합니다.
-- 직업 가치관 검사 사이트는 직업과 관련된 다양한 욕구 및 가치들에 대해 상대적으로 무엇을 얼마나 더 중요하게 여기는가를 살펴보고, 그 가치가 충족될 가능성이 높은 직업을 탐색할 수 있도록 도움을 주는 검사 사이트입니다.
+- `직업 가치관 검사 사이트`를 구현합니다.
+- 직업 가치관 검사 사이트는 직업과 관련된 다양한 욕구 및 가치들에 대해 상대적으로 무엇을 얼마나 더 중요하게 여기는가를 살펴보고, 그 `가치가 충족될 가능성이 높은 직업을 탐색`할 수 있도록 도움을 주는 검사 사이트입니다.
 
-## 사용 API
+
+
+## 2. 사용 API
 
 - 심리검사 문항 요청 https://www.career.go.kr/inspct/openapi/test/questions?apikey=인증키&q=심리검사변수
 - 심리검사 결과 요청 https://www.career.go.kr/inspct/openapi/test/report?apikey=인증키&qestrnSeq=심리검사변수
 
-## 기술 스택
 
+
+## 3. 기술 스택
+
+- HTML & CSS
 - Javascript
 - Functional Components + Hooks
 - React `17.0.1`
@@ -22,7 +27,26 @@
 - axios `0.21.1`
 - recharts `2.0.8`
 
-## 페이지 소개
+<p align="left"> 
+    <a href="https://www.w3.org/html/" target="_blank"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" alt="html5" width="70" height="70"/> 
+    </a> 
+    <a href="https://www.w3schools.com/css/" target="_blank"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" alt="css3" width="70" height="70"/> 
+    </a> 
+    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank"> 			<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="70" height="70"/> 
+    </a> 
+    <a href="https://reactjs.org/" target="_blank"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original-wordmark.svg" alt="react" width="70" height="70"/> 
+    </a>
+    <a href="https://getbootstrap.com" target="_blank"> 
+        <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/bootstrap/bootstrap-plain-wordmark.svg" alt="bootstrap" width="70" height="70"/> 
+    </a>
+</p>
+
+
+
+## 4. 페이지 소개
 
 #### 검사자 정보 입력 페이지
 
